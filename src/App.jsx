@@ -185,6 +185,25 @@ export default function App() {
     };
   }, [drawer, checkout, order, detail, menuOpen]);
 
+  /* Escape closes the topmost panel */
+  useEffect(() => {
+    const fn = (e) => {
+      if (e.key !== "Escape") return;
+      if (checkout) setCheckout(false);
+      else if (order) setOrder(null);
+      else if (drawer) setDrawer(false);
+      else if (menuOpen) setMenuOpen(false);
+    };
+    window.addEventListener("keydown", fn);
+    return () => window.removeEventListener("keydown", fn);
+  }, [checkout, order, drawer, menuOpen]);
+
+  /* Move focus into the order dialog when it appears */
+  useEffect(() => {
+    if (order && !order.sent) document.querySelector(".order-wa")?.focus();
+    if (order?.sent) document.querySelector(".order-done")?.focus();
+  }, [order]);
+
   const cartItems = Object.values(cart);
   const cartCount = cartItems.reduce((s, i) => s + i.qty, 0);
   const subtotal = cartItems.reduce((s, i) => s + priceFor(i.p, i.weight) * i.qty, 0);
@@ -430,7 +449,7 @@ export default function App() {
               <h2 className="collection-title">THE COLLECTION</h2>
               <div className="cat-row">
                 {CATEGORIES.map((c) => (
-                  <button key={c} className={`cat-pill ${category === c && !wishOnly ? "on" : ""}`} onClick={() => { setCategory(c); setWishOnly(false); }}>{c}</button>
+                  <button key={c} className={`cat-pill ${category === c && !wishOnly ? "on" : ""}`} onClick={() => { setCategory(c); setWishOnly(false); }}>{c === "All" ? "Sab Products" : c}</button>
                 ))}
                 {wishlist.length > 0 && (
                   <button className={`cat-pill ${wishOnly ? "on" : ""}`} onClick={() => setWishOnly(!wishOnly)}>♥ Wishlist</button>
@@ -564,7 +583,7 @@ export default function App() {
                 ["dates", "Ajwa Khajoor: ek khaas saugaat, ab aapke sheher mein", "Premium"],
               ].map(([img, t, tag]) => (
                 <Reveal key={t} className="journal-card">
-                  <img src={`/images/${img}.webp`} alt="" loading="lazy" />
+                  <img src={`/images/${img}.webp`} alt={t} loading="lazy" />
                   <span className="j-tag">{tag}</span>
                   <h4>{t}</h4>
                   <span className="j-link">Read Story →</span>
@@ -643,7 +662,7 @@ export default function App() {
 
       {/* ================= CART DRAWER ================= */}
       {drawer && <div className="overlay" onClick={() => setDrawer(false)} />}
-      <aside className={`drawer ${drawer ? "open" : ""}`} aria-hidden={!drawer} aria-label="Shopping cart">
+      <aside className={`drawer ${drawer ? "open" : ""}`} aria-hidden={!drawer} inert={!drawer} aria-label="Shopping cart">
         <div className="drawer-head">
           <h3>🛍️ Aapka Cart</h3>
           <button onClick={() => setDrawer(false)} aria-label="Cart band karein">✕</button>
@@ -698,7 +717,7 @@ export default function App() {
           <form className="modal" onSubmit={placeOrder}>
             <h3>Checkout — Cash on Delivery</h3>
             <p className="modal-sub">Total payable: <strong>{fmt(total)}</strong> (delivery par cash dein). Form submit karne ke baad order WhatsApp par bhejna hoga — usi se order confirm hota hai.</p>
-            <label>Poora Naam<input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Masalan: Muhammad Ali" autoComplete="name" /></label>
+            <label>Poora Naam<input required autoFocus value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Masalan: Muhammad Ali" autoComplete="name" /></label>
             <label>Mobile Number<input required type="tel" pattern="[0-9+ -]{11,15}" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="03xx-xxxxxxx" autoComplete="tel" /></label>
             <label>Sheher (City)<input required value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} placeholder="Masalan: Rawalakot" autoComplete="address-level2" /></label>
             <label>Poora Address<textarea required rows="2" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="Mohalla, gali, ghar number..." autoComplete="street-address" /></label>
@@ -725,7 +744,7 @@ export default function App() {
                 </div>
                 <p className="modal-sub">Order abhi shop tak <strong>nahi</strong> gaya. Neeche wala button dabakar WhatsApp par message bhejein — <strong>usi se aapka order confirm hoga.</strong></p>
                 <a
-                  className="btn btn-whatsapp btn-block btn-lg"
+                  className="btn btn-whatsapp btn-block btn-lg order-wa"
                   href={waLink(orderText)}
                   target="_blank"
                   rel="noreferrer"
@@ -741,7 +760,7 @@ export default function App() {
                 <h3>Shukriya, {order.name.split(" ")[0]}!</h3>
                 <p>Agar aapne WhatsApp par order <strong>#{order.num}</strong> ka message bhej diya hai, to aapka order process mein hai. Hum jald aapko call/message par confirm karenge.</p>
                 <p className="modal-sub">Total (COD): <strong>{fmt(order.total)}</strong> — payment parcel milne par.</p>
-                <button className="btn btn-accent btn-block btn-lg" onClick={() => setOrder(null)}>Shopping Jari Rakhein</button>
+                <button className="btn btn-accent btn-block btn-lg order-done" onClick={() => setOrder(null)}>Shopping Jari Rakhein</button>
               </>
             )}
           </div>
@@ -763,11 +782,13 @@ function DetailModal({ p, onAdd, onClose, wished, onWish }) {
     window.addEventListener("keydown", fn);
     return () => window.removeEventListener("keydown", fn);
   }, [onClose]);
+  const closeRef = useRef(null);
+  useEffect(() => { closeRef.current?.focus(); }, []);
   return (
     <div className="modal-wrap">
       <div className="overlay" onClick={onClose} />
       <div className="modal detail-modal" role="dialog" aria-modal="true" aria-label={`${p.name} details`}>
-        <button className="modal-x" onClick={onClose} aria-label="Band karein">✕</button>
+        <button ref={closeRef} className="modal-x" onClick={onClose} aria-label="Band karein">✕</button>
         <div className="detail-grid">
           <Thumb p={p} className="thumb-detail" eager />
           <div className="detail-info">
