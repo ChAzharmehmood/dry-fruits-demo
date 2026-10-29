@@ -52,3 +52,13 @@ Pehli dafa login mangega (browser khule ga), phir chand sawalon par Enter dabate
 - Admin panel — client khud products/prices change kar sake, orders dekhe
 - Orders ka asal system (Node.js backend + database) — demo mein orders sirf WhatsApp par jate hain
 - JazzCash / EasyPaisa payments (filhal sirf COD hai)
+
+## Audit v3 (2026-10-29) — kya improve hua
+- Palette brief ke mutabiq: deep forest green `#173F35`, warm cream `#F8F5ED`, muted gold `#C39A52`, charcoal `#242722`.
+- Header mein working search + mobile menu; wishlist (♥) localStorage ke saath; cart bhi ab browser mein persist hota hai.
+- Hero headline: "Nature's Finest, Handpicked for You." + Shop by Category grid (har card collection ko filter karke kholta hai).
+- Product detail modal: photo click/name par — description, sizes, quantity, delivery/payment/storage info.
+- Order flow honest hai: checkout ke baad order "tayyar" hota hai, WhatsApp par bhejna hi asal submission hai; us se pehle site "order confirm" nahi kehti.
+- Invented claims remove: koi fake rating/review count/stat nahi. Newsletter form hata kar WhatsApp updates ka asal option diya.
+- SEO: canonical, Open Graph, Store JSON-LD, theme-color.
+- Checks: `npm run lint` → 0 warnings/errors. `npm run build` → success.
