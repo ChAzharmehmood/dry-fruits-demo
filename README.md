@@ -1,4 +1,4 @@
-# Shahi Dry Fruits — Demo E-Commerce Website (React + Vite)
+# Kashmir Dry Fruit — Demo E-Commerce Website (React + Vite)
 
 Ek **demo** dry fruits e-commerce store, React par bani hui — Vercel par live deploy karne ke liye ready.
 Client ko dikhane ke liye hai: products, weight select (250g / 500g / 1 KG), cart, COD checkout, WhatsApp ordering — sab kaam karta hai. Backend/database abhi nahi hai (demo hai), data files mein hai.

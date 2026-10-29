@@ -5,8 +5,8 @@
 //  update ho jayegi.
 // ============================================================
 export const SHOP = {
-  name: "Shahi Dry Fruits",
-  tagline: "Premium Quality Dry Fruits",
+  name: "Kashmir Dry Fruit",
+  tagline: "Premium Nuts & Dried Fruits",
   // Demo ke liye abhi Azhar ka apna number hai — client ka number
   // milte hi yahan sirf ye line badalni hai (92 format mein, 0 ke baghair).
   whatsapp: "923331674465",
